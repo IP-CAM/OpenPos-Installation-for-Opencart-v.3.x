@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>{{ subject }}</title>
+</head>
+<body>
+<div class="content">
+	Dear {{ supplier_name }},
+	<br /><br />
+	Please send the below listed product(s) as per the given quantity as soon as possible.
+	<br /><br />
+	<table border="1" cellpadding="10" cellspacing="0" style="text-align: center;">
+		<thead style="font-weight: bold;">
+			<tr>
+				<td>Product Name</td>
+				<td>Quantity</td>
+				<td>Comment</td>
+			</tr>
+		</thead>
+		<tbody>
+			{% for product in products %}
+			<tr>
+				<td>{{ product.name }}</td>
+				<td>{{ product.quantity }}</td>
+				<td>{{ product.comment }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<br /><br />
+	Regards
+	<br />
+	{{ user }}<br />
+	{{ outlet }}<br />
+	{{ address }}
+</div>
+</body>
+</html>

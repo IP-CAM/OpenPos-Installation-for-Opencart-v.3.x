@@ -1,0 +1,521 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+      <div class="btn-group pull-right">
+        <button class="btn btn-success" data-original-title="{{ help_mass_print }}" data-toggle="tooltip" onclick="massPrint();"><i class="fa fa-print"></i> {{ text_mass_print }}</button>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_list }}</h3>
+      </div>
+      <div class="panel-body">
+        <div class="well">
+          <div class="row">
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label class="control-label" for="input-name">{{ entry_name }}</label>
+                <input type="text" name="filter_name" value="" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label class="control-label" for="input-model">{{ entry_model }}</label>
+                <input type="text" name="filter_model" value="" placeholder="{{ entry_model }}" id="input-model" class="form-control" />
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label class="control-label" for="input-price">{{ entry_price }}</label>
+                <input type="text" name="filter_price" value="" placeholder="{{ entry_price }}" id="input-price" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label class="control-label" for="input-quantity">{{ entry_quantity }}</label>
+                <input type="text" name="filter_quantity" value="" placeholder="{{ entry_quantity }}" id="input-quantity" class="form-control" />
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label class="control-label" for="input-status">{{ entry_status }}</label>
+                <select name="filter_status" id="input-status" class="form-control">
+                  <option value=""></option>
+                  <option value="1">{{ text_enabled }}</option>
+                  <option value="0">{{ text_disabled }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label class="control-label" for="input-assign">{{ entry_assign }}</label>
+                <input type="text" name="filter_assign" value="" placeholder="{{ entry_assign }}" id="input-assign" class="form-control" />
+              </div>
+              <button type="button" id="button-filter" class="btn btn-primary pull-right"><i class="fa fa-search"></i> {{ button_filter }}</button>
+            </div>
+          </div>
+        </div>
+        <form action="{{ mass_print }}" method="post" id="mass-print-form" enctype="multipart/form-data">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <td style="width: 1px;" class="text-center"><input type="checkbox" name="allcheckbox" id="allcheckbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" value="1" /></td>
+                  <td class="text-center">{{ column_image }}</td>
+                  <td class="text-left">
+                    <a class="sort asc" sort="pd.name" order="asc">{{ column_name }}</a>
+                  </td>
+                  <td class="text-left">
+                    <a class="sort" sort="p.model" order="">{{ column_model }}</a>
+                  </td>
+                  <td class="text-center" style="width: 145px;">
+                    <a class="sort" sort="wb.barcode" order="">{{ column_barcode }}</a>
+                  </td>
+                  <td class="text-right">
+                    <a class="sort" sort="p.price" order="">{{ column_price }}</a>
+                  </td>
+                  <td class="text-right">
+                    <a class="sort" sort="p.quantity" order="">{{ column_quantity }}</a>
+                  </td>
+                  <td class="text-left">
+                    <a class="sort" sort="p.status" order="">{{ column_status }}</a>
+                  </td>
+                  <!-- <td class="text-left">
+                    <a class="sort" sort="wp.status" order="">{{ column_pos_status }}</a>
+                  </td> -->
+                  <td class="text-right" style="width: 100px;">
+                    <a class="sort" sort="wp.quantity" order="">{{ column_assign }}</a>
+                  </td>
+                  <td class="text-center">{{ column_action }}</td>
+                </tr>
+              </thead>
+              <tbody id="productBody">
+                <tr></tr>
+              </tbody>
+              <tfoot>
+                <tr><td colspan="11" class="alert-info text-center" id="productFoot"></td></tr>
+              </tfoot>
+            </table>
+          </div>
+          <input type="hidden" name="print_quantity" id="printQuant">
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="printBarcode" class="modal fade" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">{{ text_enter_barcode }}</h4>
+        </div>
+        <div class="modal-body" style="padding-bottom: 45px;">
+          <form class="form-horizontal" action="{{ print_action }}" method="post">
+            <div class="form-group">
+              <label class="control-label col-sm-3" for="barcode-quantity">{{ entry_quantity }}</label>
+              <div class="col-sm-9">
+                <input type="number" min="1" name="quantity" id="barcode-quantity" class="form-control">
+                <input type="hidden" name="product_id" id="productId">
+              </div>
+            </div>
+            <div class="col-sm-12 text-center">
+              <input type="submit" class="btn btn-primary" value="{{ button_print }}">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{ button_close }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-info hide" id="showModal" data-toggle="modal" data-target="#printBarcode"><i class="fa fa-eye"></i></button>
+  <script type="text/javascript" src="../wkpos/js/toast.js"></script>
+  <script type="text/javascript" src="../wkpos/js/hash.js"></script>
+  <script type="text/javascript"><!--
+  $('input[name=\'filter_name\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['product_id']
+            }
+          }));
+        },
+        error: function () {
+          location = 'index.php?route=wkpos/products&user_token={{ user_token }}';
+        }
+      });
+    },
+    'select': function(item) {
+      $('input[name=\'filter_name\']').val(item['label']);
+    }
+  });
+
+  $('input[name=\'filter_model\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_model=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['model'],
+              value: item['product_id']
+            }
+          }));
+        },
+        error: function () {
+          location = 'index.php?route=wkpos/products&user_token={{ user_token }}';
+        }
+      });
+    },
+    'select': function(item) {
+      $('input[name=\'filter_model\']').val(item['label']);
+    }
+  });
+//--></script>
+  <script type="text/javascript"><!--
+  var order = 'ASC';
+  var sort = 'pd.name';
+  var filter_name = '', filter_model = '', filter_price = '', filter_quantity = '', filter_assign = '', filter_status = '';
+  var product_listed = 0;
+  var product_prev = 0;
+  var start = 0;
+  var all = false;
+  var in_process = false;
+
+  function loadProducts() {
+    var product_data = {
+      start: start,
+      order: order,
+      sort: sort,
+      filter_name: filter_name,
+      filter_model: filter_model,
+      filter_price: filter_price,
+      filter_quantity: filter_quantity,
+      filter_assign: filter_assign,
+      filter_status: filter_status
+    };
+    $.ajax({
+      url: 'index.php?route=wkpos/products/loadProducts&user_token={{ user_token }}',
+      data: product_data,
+      type: 'post',
+      dataType: 'json',
+      beforeSend: function () {
+        $('#productFoot').append(' <i class="fa fa-spin fa-spinner"></i>');
+        in_process = true;
+      },
+      success: function(json) {
+        in_process = false;
+        if (json['success']) {
+          var product_html = '';
+          var products = json['products'];
+          for (var i = 0; i < products.length; i++) {
+            product_listed++;
+            product_html += '<tr product-id="' + products[i]['product_id'] + '">';
+
+            if($('#allcheckbox').is(':checked')) {
+              product_html += '  <td class="text-center"><input type="checkbox" checked name="selected[]" value="' + products[i]['product_id'] + '" /></td>';
+            } else {
+              product_html += '  <td class="text-center"><input type="checkbox" name="selected[]" value="' + products[i]['product_id'] + '" /></td>';
+            }
+            product_html += '  <td class="text-center">';
+            if (products[i]['image']) {
+              product_html += '    <img src="' + products[i]['image'] + '" alt="' + products[i]['name'] + '" class="img-thumbnail" />';
+            } else {
+              product_html += '    <span class="img-thumbnail list"><i class="fa fa-camera fa-2x"></i></span>';
+            }
+            product_html += '    </td>';
+            product_html += '  <td class="text-left">' + products[i]['name'] + '</td>';
+            product_html += '  <td class="text-left">' + products[i]['model'] + '</td>';
+            product_html += '  <td class="text-center">';
+            if (products[i]['barcode']) {
+              product_html += '  <img src="' + products[i]['barcode'] + '">';
+            } else {
+              product_html += '  <span class="img-thumbnail list"><i class="fa fa-barcode fa-2x"></i></span>';
+            }
+            product_html += '  </td>';
+            product_html += '  <td class="text-right">';
+            if (products[i]['special']) {
+              product_html += '    <span style="text-decoration: line-through;">' + products[i]['price'] + '</span><br/>';
+              product_html += '    <div class="text-danger">' + products[i]['special'] + '</div>';
+            } else {
+              product_html += '    ' + products[i]['price'] + '';
+            }
+            product_html += '  <td class="text-right">';
+            if (products[i]['quantity'] <= 0) {
+              product_html += '    <span class="label label-warning">' + products[i]['quantity'] + '</span>';
+            } else if (products[i]['quantity'] <= 5) {
+              product_html += '    <span class="label label-danger">' + products[i]['quantity'] + '</span>';
+            } else {
+              product_html += '    <span class="label label-success">' + products[i]['quantity'] + '</span>';
+            }
+            product_html += '  <td class="text-left">' + products[i]['status'] + '</td>';
+            product_html += '  <td class="text-center"><span class="label label-default">' + products[i]['pos_quantity'] + '</span></td>';
+
+            product_html += '  <td class="text-right">';
+
+            if (products[i]['barcode']) {
+              product_html += '  <button type="button" class="btn btn-success showModal" title="{{ title_print }}"><i class="fa fa-print"></i></button>';
+              product_html += '  <button type="button" class="btn btn-warning active generateBarcode" title="{{ title_regenerate }}"><i class="fa fa-barcode"></i></button>';
+            } else {
+              product_html += '  <button type="button" class="btn btn-warning generateBarcode" title="{{ title_generate }}"><i class="fa fa-barcode"></i></button>';
+            }
+
+            product_html += '  </td>';
+
+            product_html += '</tr>';
+            if (product_listed == json['product_total']) {
+              all = true;
+            }
+          }
+          $('#productBody').append(product_html);
+          $('#productFoot').text('Showing ' + product_listed + ' of ' + json['product_total']);
+        } else {
+          $('#productBody').html('<tr></tr>');
+          $('#productFoot').text('{{ text_no_products }}');
+        }
+      },
+      error: function () {
+        in_process = false;
+        location = 'index.php?route=wkpos/products&user_token={{ user_token }}';
+      }
+    });
+  }
+
+  $(window).on('scroll', function () {
+    var diff = $(document).height() - $(window).height();
+    var foot = diff - $(window).scrollTop();
+
+    if ((foot < 200) && !in_process) {
+      start = product_listed;
+
+      if (product_listed && (product_listed != product_prev) && !all) {
+        loadProducts();
+        product_prev = product_listed;
+      }
+    };
+  });
+
+  $('.sort').on('click', function () {
+    var thisthis = $(this);
+    var sort_it = thisthis.attr('sort');
+    $('.desc').removeClass('desc');
+    $('.asc').removeClass('asc');
+
+    if (sort_it == sort) {
+      if (thisthis.attr('order') == 'asc') {
+        order = 'DESC';
+      } else {
+        order = 'ASC';
+      }
+    } else {
+      sort = sort_it;
+    }
+    if (order == 'ASC') {
+      thisthis.addClass('asc');
+      thisthis.attr('order', 'asc');
+    } else {
+      thisthis.addClass('desc');
+      thisthis.attr('order', 'desc');
+    }
+    product_listed = 0;
+    product_prev = 0;
+    start = 0;
+    all = false;
+    $('#productBody').html('<tr></tr>');
+    $('#productFoot').html('');
+    loadProducts();
+  });
+
+  $('body').on('click', '.generateBarcode', function () {
+    var thisthis = $(this);
+    var product_id = thisthis.parent().parent().attr('product-id');
+
+    $.ajax({
+      url: 'index.php?route=wkpos/products/generateBarcode&user_token={{ user_token }}',
+      data: {product_id: product_id},
+      type: 'post',
+      dataType: 'json',
+      beforeSend: function () {
+        thisthis.attr('disabled', 'disabled').html('<i class="fa fa-spin fa-spinner"></i>');
+      },
+      success: function(json) {
+        thisthis.removeAttr('disabled').html('<i class="fa fa-barcode"></i>');
+        if (json['success']) {
+          thisthis.parent().parent().children('td:nth-child(5)').html('<img src="' + json['image'] + '">');
+          thisthis.parent().html('<button class="btn btn-success showModal" title="{{ title_print }}"><i class="fa fa-print"></i></button><button type="button" class="btn btn-warning active generateBarcode" title="{{ title_regenerate }}"><i class="fa fa-barcode"></i></button>');
+          $.toaster({
+              priority: 'success',
+              title: 'Notice',
+              message: json['success'],
+              timeout: 3000
+          });
+        }
+      },
+      error: function () {
+        location = 'index.php?route=wkpos/products&user_token={{ user_token }}';
+      }
+    });
+  });
+
+  $('body').on('click', '.showModal', function () {
+    $('.modal-body .text-center').html('<input type="submit" class="btn btn-primary" value="{{ button_print }}" />');
+    $('.modal-title').text('{{ text_enter_barcode }}');
+    $('#showModal').trigger('click');
+    var thisthis = $(this);
+    var product_id = thisthis.parent().parent().attr('product-id');
+    $('#productId').val(product_id);
+  });
+
+  $('body').on('click', '.printBarcode', function () {
+    var thisthis = $(this);
+    var product_id = thisthis.parent().parent().attr('product-id');
+
+    $.ajax({
+      url: 'index.php?route=wkpos/products/printBarcode&user_token={{ user_token }}',
+      data: {product_id: product_id},
+      type: 'post',
+      dataType: 'json',
+      beforeSend: function () {
+        thisthis.attr('disabled', 'disabled').html('<i class="fa fa-spin fa-spinner"></i>');
+      },
+      success: function(json) {
+        thisthis.removeAttr('disabled').html('<i class="fa fa-barcode"></i>');
+        if (json['success']) {
+          thisthis.parent().parent().children('td:nth-child(4)').html('<img src="' + json['image'] + '">');
+          thisthis.parent().html('<button class="btn btn-success printBarcode" title="{{ title_print }}"><i class="fa fa-print"></i></button>');
+          $.toaster({
+              priority: 'success',
+              title: 'Notice',
+              message: json['success'],
+              timeout: 3000
+          });
+        }
+      },
+      error: function () {
+        location = 'index.php?route=wkpos/products&user_token={{ user_token }}';
+      }
+    });
+  });
+
+  function massPrint() {
+    $('.modal-body .text-center').html('<button type="button" onclick="$(\'#mass-print-form\').submit();" class="btn btn-primary">{{ button_print_all }}</button>');
+    $('.modal-title').text('{{ text_multi_print }}');
+    $('#showModal').trigger('click');
+  }
+
+  $('#barcode-quantity').on('change', function(){
+    $('#printQuant').val($('#barcode-quantity').val());
+  });
+//--></script>
+  <script type="text/javascript"><!--
+  $('#button-filter').on('click', function() {
+    filter_name = $('input[name=\'filter_name\']').val();
+    if (filter_name) {
+      setHash('filter_name', filter_name);
+    } else {
+      removeHash('filter_name');
+    }
+
+    filter_model = $('input[name=\'filter_model\']').val();
+    if (filter_model) {
+      setHash('filter_model', filter_model);
+    } else {
+      removeHash('filter_model');
+    }
+
+    filter_price = $('input[name=\'filter_price\']').val();
+    if (filter_price) {
+      setHash('filter_price', filter_price);
+    } else {
+      removeHash('filter_price');
+    }
+
+    filter_quantity = $('input[name=\'filter_quantity\']').val();
+    if (filter_quantity) {
+      setHash('filter_quantity', filter_quantity);
+    } else {
+      removeHash('filter_quantity');
+    }
+
+    filter_assign = $('input[name=\'filter_assign\']').val();
+    if (filter_assign) {
+      setHash('filter_assign', filter_assign);
+    } else {
+      removeHash('filter_assign');
+    }
+
+    filter_status = $('select[name=\'filter_status\']').val();
+    if (filter_status) {
+      setHash('filter_status', filter_status);
+    } else {
+      removeHash('filter_status');
+    }
+
+    product_listed = 0;
+    product_prev = 0;
+    start = 0;
+    all = false;
+    $('#productBody').html('<tr></tr>');
+    $('#productFoot').html('');
+    loadProducts();
+  });
+//--></script>
+<script type="text/javascript">
+  $(document).ready(function () {
+    var checkFilterName = getHash('filter_name');
+    if (checkFilterName) {
+      filter_name = checkFilterName;
+      $('input[name=\'filter_name\']').val(filter_name);
+    }
+    var checkFilterModel = getHash('filter_model');
+    if (checkFilterModel) {
+      filter_model = checkFilterModel;
+      $('input[name=\'filter_model\']').val(filter_model);
+    }
+    var checkFilterPrice = getHash('filter_price');
+    if (checkFilterPrice) {
+      filter_price = checkFilterPrice;
+      $('input[name=\'filter_price\']').val(filter_price);
+    }
+    var checkFilterStatus = getHash('filter_status');
+    if (checkFilterStatus) {
+      filter_status = checkFilterStatus;
+      $('select[name=\'filter_status\'] option[value="' + filter_status + '"]').prop('selected', true);
+    }
+    var checkFilterQuantity = getHash('filter_quantity');
+    if (checkFilterQuantity) {
+      filter_quantity = checkFilterQuantity;
+      $('input[name=\'filter_quantity\']').val(filter_quantity);
+    }
+    var checkFilterAssign = getHash('filter_assign');
+    if (checkFilterAssign) {
+      filter_assign = checkFilterAssign;
+      $('input[name=\'filter_assign\']').val(filter_assign);
+    }
+    loadProducts();
+  });
+</script></div>
+<style type="text/css">
+  thead td a {
+    cursor: pointer;
+  }
+</style>
+{{ footer }}

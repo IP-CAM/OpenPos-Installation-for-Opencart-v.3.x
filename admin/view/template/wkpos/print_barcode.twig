@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ text_print_barcode }}</title>
+<script type="text/javascript" src="view/javascript/jquery/jquery-2.1.1.min.js"></script>
+<link href="view/stylesheet/bootstrap.css" type="text/css" rel="stylesheet" />
+<link href="view/javascript/font-awesome/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+{% if mass is defined %}
+{% for barcode in barcodes %}
+{% for i in 1..quantity %}
+	<div style="display: inline-block; margin: 10px 5px; text-align: center;">
+		<img src="{{ barcode.image }}"><br>
+		{{ barcode.name }}
+	</div>
+{% endfor %}
+{% endfor %}
+{% else %}
+{% for i in 1..quantity %}
+	<div style="display: inline-block; margin: 10px 5px; text-align: center;">
+		<img src="{{ image }}"><br>
+		{% if barcode_name %}
+		{{ name }}
+		{% endif %}
+	</div>
+{% endfor %}
+{% endif %}
+<div class="btn-group" style="margin-left: 5px; display: block;">
+	<a href="{{ cancel }}" class="btn btn-warning"><i class="fa fa-arrow-left"></i> {{ button_back }}</a>
+	<button class="btn btn-success"><i class="fa fa-print"></i> {{ button_print }}</button>
+</div>
+<script type="text/javascript">
+	$('.btn-success').on('click', function () {
+		$('.btn-group').css('display', 'none');
+		window.print();
+		$('.btn-group').css('display', 'block');
+	});
+</script>
+</body>
+</html>

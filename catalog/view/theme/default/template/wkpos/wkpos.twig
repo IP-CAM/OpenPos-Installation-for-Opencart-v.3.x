@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<!--[if IE 8 ]><html dir="{{ direction }}" lang="{{ lang }}" class="ie8"><![endif]-->
+<!--[if IE 9 ]><html dir="{{ direction }}" lang="{{ lang }}" class="ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<!-- <html dir="{{ direction }}" lang="{{ lang }}" manifest="../manifest.appcache"> -->
+<html dir="{{ direction }}" lang="{{ lang }}">
+<!--<![endif]-->
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>{{ title }}</title>
+<base href="{{ base }}" />
+{% if description %}
+<meta name="description" content="{{ description }}" />
+{% endif %}
+{% if keywords %}
+<meta name="keywords" content= "{{ keywords }}" />
+{% endif %}
+<script src="catalog/view/javascript/jquery/jquery-2.1.1.min.js" type="text/javascript"></script>
+<link href="catalog/view/javascript/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+<script src="catalog/view/javascript/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<link href="catalog/view/javascript/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+<link href="//fonts.googleapis.com/css?family=Open+Sans:400,400i,300,700" rel="stylesheet" type="text/css" />
+<link href="catalog/view/theme/default/stylesheet/stylesheet.css" rel="stylesheet">
+<link href="wkpos/css/wkpos.css" rel="stylesheet" media="screen">
+<script src="catalog/view/javascript/jquery/datetimepicker/moment/moment.min.js" type="text/javascript"></script>
+<script src="catalog/view/javascript/jquery/datetimepicker/moment/moment-with-locales.min.js" type="text/javascript"></script>
+<script src="catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+<link href="catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" media="screen" />
+{% for style in styles %}
+<link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}" />
+{% endfor %}
+<script src="wkpos/js/common.js" type="text/javascript"></script>
+<script src="wkpos/js/wkpos.js" type="text/javascript"></script>
+{% for link in links %}
+<link href="{{ link.href }}" rel="{{ link.rel }}" />
+{% endfor %}
+{% for script in scripts %}
+<script src="{{ script }}" type="text/javascript"></script>
+{% endfor %}
+<style type="text/css">
+ .thermal {
+   width: 80mm;
+ }
+</style>
+</head>
+<body>
+  <div id="top-div">
+    <div id="clockin">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-body">
+            <h3><b>{{ text_resume_sess }}</b></h3>
+            <button class="btn buttons-sp" id="resumeSession" tabindex="5"><i class="fa fa-hourglass-half"></i> {{ text_resume }}</button>
+            <button class="btn buttons-sp" id="startSession" tabindex="6"><i class="fa fa-hourglass-start"></i> {{ text_start_sess }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="postorder">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-body">
+            <h3 style="margin-top: 0;"><b>{{ heading_invoice }}</b></h3>
+            <button class="btn buttons-sp" onclick="printInvoice();"><i class="fa fa-print"></i> {{ button_invoice }}</button>
+            <button class="btn buttons-sp pull-right" onclick="$('#postorder, #loader').css('display', 'none');">{{ button_skip }} <i class="fa fa-arrow-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="loginModalParent">
+      <div class="col-sm-7 col-xs-12 home-div">
+        <h2><b>{% if pos_heading1 %}{{ pos_heading1 }}{% else %}A Complete Retail Management Solution{% endif %}</b></h2>
+        <div>
+      <h3><b>{% if pos_heading2 %}{{ pos_heading2 }}{% else %}Branding{% endif %}</b></h3>
+          {% if pos_content %}
+            {{ pos_content }}
+          {% else %}
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-sm-5 col-xs-12 text-center login-div">
+        <div class="form-horizontal">
+          <h3>{{ heading_login }}</h3>
+          <div class="form-group input-group">
+            <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+            <input type="text" class="form-control" id="input-username" placeholder="{{ entry_username }}" value="" name="username" tabindex="2">
+          </div>
+          <div class="form-group input-group">
+            <span class="input-group-addon"><i class="fa fa-key"></i></span>
+            <input type="password" class="form-control" id="input-password" placeholder="{{ entry_password }}" value="" name="password" tabindex="3">
+          </div>
+          <button class="buttons-sp" id="login-submit" onclick="loginUser();" tabindex="4">{{ button_signin }}</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-1" id="pos-side-panel">
+      <div class="col-xs-12" id="left-panel">
+        <div class="wksidepanel button-payment" id="button-payment"><i class="fa fa-credit-card"></i><br><span class="hidden-xs">{{ text_checkout }}</span></div>
+        <div class="wksidepanel" id="button-order"><i class="fa fa-circle-o"></i><br><span class="hidden-xs">{{ text_orders }}</span></div>
+        <div class="wksidepanel" id="button-account"><i class="fa fa-wrench"></i><br><span class="hidden-xs">{{ text_settings }}</span></div>
+        <div class="wksidepanel" id="button-other"><i class="fa fa-gears"></i><br><span class="hidden-xs">{{ text_others }}</span></div>
+      </div>
+      <div class="mode-div">
+        <button class="btn label label-success" id="mode"><i class="fa fa-toggle-on"></i> <span class="hidden-xs">{{ text_online }}</span></button>
+      </div>
+    </div>
+    <div class="col-xs-8 category-div">
+      <div class="col-xs-12 upper-category">
+        <div class="col-xs-9 col-md-8 lower-category">
+          <div class="wkcategory categoryProduct" category-id="0" style="color: #0c8c00;"><span class="hidden-xs">{{ text_populars }}</span><span class="hidden-sm hidden-md hidden-lg"><i class="fa fa-fire font-22"></i></span></div>
+          <span class="hidden-xs">
+          {% for key, category in categories if key < 2 %}
+            <div class="wkcategory categoryProduct" category-id="{{ category.category_id }}">{{ category.name }}</div>
+          {% endfor %}
+          </span>
+          <span data-toggle="modal" data-target="#categoryList" class="wkcategory"><i class="fa fa-list font-22"></i></span>
+        </div>
+        <div class="col-xs-3 col-md-4" id="search-div">
+          <input type="text" name="search" id="search" class="form-control" placeholder="{{ text_search }}">
+        </div>
+      </div>
+      <div class="col-xs-12 text-center" style="padding: 0;">
+        <h4>{{ text_all_products }}</h4>
+        <div class="col-xs-12" id="product-panel">
+        </div>
+      </div>
+      <div class="parents account-parent">
+        <div class="payment-child" style="width: 35%;">
+          <div class="wkpaymentmethod wkaccounts" type="basic"><i class="fa fa-wrench"></i> <span class="margin-10">{{ text_basic_settings }}</span><i class="fa fa-chevron-right hide"></i></div>
+          <div class="wkpaymentmethod wkaccounts" type="other"><i class="fa fa-cogs"></i> <span class="margin-10">{{ text_other_settings }}</span><i class="fa fa-chevron-right hide"></i></div>
+        </div>
+        <div class="payment-child2 form-horizontal" style="width: 65%;">
+          <span class="pull-right cursor color-black close-it"><i class="fa fa-times font-25"></i></span>
+          <div class="basic-account setting-account hide">
+            <div class="scroll-account">
+              <div class="form-group required">
+                <label class="col-sm-4 control-label" for="first-name">{{ text_firstname }}</label>
+                <div class="col-sm-8">
+                  <input class="form-control" id="first-name" name="firstname" placeholder="{{ text_firstname }}" type="text" value="{{ firstname }}">
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-4 control-label" for="last-name">{{ text_lastname }}</label>
+                <div class="col-sm-8">
+                  <input class="form-control" id="last-name" name="lastname" placeholder="{{ text_lastname }}" type="text" value="{{ lastname }}">
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-4 control-label" for="user-name">{{ text_username }}</label>
+                <div class="col-sm-8">
+                  <input class="form-control" id="user-name" name="username" placeholder="{{ text_username }}" type="text" value="{{ username }}">
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-4 control-label" for="account-email">{{ text_account_email }}</label>
+                <div class="col-sm-8">
+                  <input class="form-control" id="account-email" name="account_email" placeholder="{{ text_account_email }}" type="text" value="{{ email }}">
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-4 control-label" for="account-ppwd">{{ text_ppassword }}</label>
+                <div class="col-sm-8">
+                  <input class="form-control" id="account-ppwd" name="account_ppwd" placeholder="{{ text_ppassword }}" type="password" value="">
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-4 control-label" for="account-npwd">{{ text_npassword }}</label>
+                <div class="col-sm-8">
+                  <input class="form-control" id="account-npwd" name="account_npwd" placeholder="{{ text_npassword }}" type="password" value="">
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-4 control-label" for="account-cpwd">{{ text_cpassword }}</label>
+                <div class="col-sm-8">
+                  <input class="form-control" id="account-cpwd" name="account_cpwd" placeholder="{{ text_cpassword }}" type="password" value="">
+                </div>
+              </div>
+            </div>
+            <button class="col-xs-12 btn buttons-sp button-accounts" stype="basic"><strong>{{ text_save_details }}</strong></button>
+          </div>
+          <div class="other-account setting-account hide">
+            <div class="form-group">
+              <label class="col-sm-4 control-label" for="input-langauge">{{ text_language }}</label>
+              <div class="col-sm-8">
+                <select class="form-control" id="input-language">
+                  {% for language_value in languages %}
+                  {% if language == language_value.code %}
+                  <option value="{{ language_value.code }}" selected="selected">{{ language_value.name }}</option>
+                  {% else %}
+                  <option value="{{ language_value.code }}">{{ language_value.name }}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-4 control-label" for="input-currency">{{ text_currency }}</label>
+              <div class="col-sm-8">
+                <select class="form-control" id="input-currency">
+                  {% for currency_value in currencies %}
+                  {% if currency == currency_value.code %}
+                    <option value="{{ currency_value.code }}" selected="selected">{{ currency_value.title }}</option>
+                  {% else %}
+                    <option value="{{ currency_value.code }}">{{ currency_value.title }}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <button class="col-xs-12 btn buttons-sp button-accounts" stype="other"><strong>{{ text_save }}</strong></button>
+          </div>
+        </div>
+      </div>
+      <div class="parents payment-parent">
+        <div class="payment-child">
+          <h3 class="payment-heading"><strong>{{ heading_payments }}:</strong></h3>
+          <div id="payment-methods">
+            {% if cash_payment_status %}
+            <div class="wkpaymentmethod" type="cash-payment"><i class="fa fa-money"></i> <span class="margin-10">{{ cash_payment_title }}</span><i class="fa fa-chevron-right hide"></i></div>
+            {% endif %}
+            {% if card_payment_status %}
+            <div class="wkpaymentmethod" type="card-payment"><i class="fa fa-credit-card"></i> <span class="margin-10">{{ card_payment_title }}</span><i class="fa fa-chevron-right hide"></i></div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="payment-child2 form-horizontal">
+          <span class="pull-right cursor color-black close-it"><i class="fa fa-times font-25"></i></span>
+          <div class="cash-payment hide">
+            <div class="form-group">
+              <label class="col-sm-4 control-label">{{ text_balance_due }}</label>
+              <div class="col-sm-8">
+                <div class="form-control" id="balance-due"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-4 control-label" for="amount-tendered">{{ text_tendered }}</label>
+              <div class="col-sm-8">
+                <div class="input-group input-group1">
+                  {% if symbol_position == 'L' %}
+                  <span class="input-group-addon currency"><strong>{{ currency_code }}</strong></span>
+                  {% else %}
+                  <span class="input-group-addon currency" style="display: none;">{{ currency_code }}</span>
+                  {% endif %}
+                  <input class="form-control" id="amount-tendered" placeholder="" type="text" onkeypress="return validate(event, this)">
+                  {% if symbol_position == 'R' %}
+                  <span class="input-group-addon currency"><strong>{{ currency_code }}</strong></span>
+                  {% else %}
+                  <span class="input-group-addon currency" style="display: none;">{{ currency_code }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-4 control-label">{{ text_change }}</label>
+              <div class="col-sm-8">
+                <div class="form-control" id="change"></div>
+              </div>
+            </div>
+          </div>
+          <div class="all-payment hide">
+            <div class="form-group">
+              <div class="col-sm-12">
+                <textarea class="form-control" id="orderNote" placeholder="{{ text_add_order_note }}"></textarea>
+              </div>
+            </div>
+            <button class="col-xs-12 btn buttons-sp accept-payment" ptype=""><strong>{{ button_payment }}</strong></button>
+          </div>
+        </div>
+      </div>
+      <div class="parents order-parent">
+        <div class="col-xs-12 order-child">
+          <div class="wkcategory wkorder" otype="1">{{ text_previous }}</div>
+          <div class="wkcategory wkorder" otype="2">{{ text_onhold }}</div>
+          <div class="wkcategory wkorder" otype="3">{{ text_offline }}</div>
+          <span class="pull-right cursor color-black close-it"><i class="fa fa-times font-25"></i></span>
+        </div>
+        <div class="col-sm-12" id="order-container">
+          <div class="row" id="orders"></div>
+        </div>
+      </div>
+      <div class="parents other-parent">
+        <div class="col-xs-12 other-child">
+          <div class="wkcategory wkother" otype="1">{{ text_low_stock }}</div>
+          <div class="wkcategory wkother" otype="2">{{ text_request }}</div>
+          <div class="wkcategory wkother" otype="3">{{ text_request_history }}</div>
+          <span class="pull-right cursor color-black close-it"><i class="fa fa-times font-25"></i></span>
+        </div>
+        <div class="col-sm-12" id="other-container">
+          <div class="row" id="others"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-3" id="cart-panel">
+      <div id="logger-detail">
+        <div class="logger-div pull-left">
+          <img src="{{ image }}" class="img-responsive logger-img pull-left" width="40" height="40">
+          <div class="pull-left" style="margin-left: 5px;">
+            <span class="logger-name">{{ name }}</span><br>
+            <span class="logger-post hidden-xs">({{ group_name }})</span><br>
+            <div class="dropdown">
+              <button class="btn label label-info dropdown-toggle" data-toggle="dropdown">{{ text_more }} <i class="caret"></i></button>
+              <ul class="dropdown-menu dropdown-menu-left cursor">
+                <li>
+                  <a onclick="accountSettings(this);">{{ text_account_settings }}</a>
+                </li>
+                <li>
+                  <a onclick="logout();">{{ text_logout }}</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sidepanel color-black">
+        <div class="upper-category"><i class="fa fa-chevron-right pull-right close-it cursor"></i><span class="order-txn">{{ text_order_id }}</span> #<span class="oid"></span></div>
+        <div id="sidepanel-inner" style="display: none;">
+          <div class="col-xs-12" id="order-upper-div">
+            <div class="pull-left">
+              <span class="order-date"></span><br/>
+              <span class="order-time"></span><br/>
+              <span>{{ text_purchase }}</span>
+            </div>
+            <div class="pull-right" id="order-address"></div>
+          </div>
+          <div class="col-xs-12" style="margin-top: 10px;">
+            <span class="pull-left font-bold">{{ text_shipping_mode }}:&nbsp;</span>
+            <span class="">{{ text_pickup }}</span>
+          </div>
+          <h5 class="col-xs-12 font-bold">{{ text_order_details }}</h5>
+          <div class="width-100 order-scroll">
+            <div class="col-xs-12 table-responsive">
+              <table class="table table-hover margin-bottom-0" id="oitem-table">
+                <tbody id="oitem-body">
+                </tbody>
+              </table>
+            </div>
+            <hr class="hr-tag">
+            <hr class="hr-tag">
+            <div class="col-xs-12 table-responsive">
+              <table class="table table-hover margin-bottom-0">
+                <tbody id="oTotals">
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <hr class="hr-tag">
+          <div class="col-xs-12 table-responsive table-total" style="margin: 0; width: 100%;">
+            <table class="table table-hover margin-bottom-0">
+              <tbody>
+                <tr>
+                  <td class="text-left">{{ text_total }}</td>
+                  <td class="text-right oTotal">00.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-xs-12" style="margin-top: 5px;">
+            <span class="pull-left font-bold">{{ text_payment_mode }}:&nbsp;</span>
+            <span class="opayment"></span>
+          </div>
+          <div class="col-xs-12" style="margin-top: 5px;">
+            <span class="pull-left font-bold">{{ text_note }}:&nbsp;</span>
+            <span class="onote"></span>
+          </div>
+          <div class="col-xs-12" style="margin-top: 5px;">
+            <button onclick="printBill();" class="buttons-sp width-100">{{ text_print }}</button>
+          </div>
+        </div>
+        <div class="order-loader hide">
+          <div class="cp-spinner cp-round"></div>
+        </div>
+      </div>
+      <div class="col-xs-12 upper-cart-detail">
+        <div class="col-xs-12 lower-cart-detail">
+          <div class="pull-left"><i class="fa fa-trash cursor font-22" title="{{ text_delete_cart }}" data-toggle="tooltip" onclick="cart_list.delete(1)"></i></div>
+          <b class="cursor" id="more-carts"><span class="">{{ text_cart_details }}</span> (<span class="cart-total">0</span>) <span class="caret"> </span></b>
+          <div id="upper-cart">
+          </div>
+          <div class="pull-right"><i class="fa fa-plus-circle cursor font-22" title="{{ text_add_product }}" data-toggle="modal" data-target="#addProduct"></i></div>
+        </div>
+        <br>
+        <div id="cart-detail">
+          <div class="table-responsive">
+            <table class="table table-hover margin-bottom-0" id="item-table">
+              <tbody id="item-body">
+                <tr><td class="text-center">{{ text_empty_cart }}</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <hr class="hr-tag">
+          <hr class="hr-tag">
+          <div class="table-responsive div-totals">
+            <table class="table table-hover margin-bottom-0">
+              <tbody>
+                <tr>
+                  <td class="text-left">{{ text_subtotal }}</td>
+                  <td class="text-right" id="subtotal">0.00</td>
+                </tr>
+                {% if tax_status %}
+                <tr>
+                  <td class="text-left">{{ button_tax }}</td>
+                  <td class="text-right" id="tax">$0.00</td>
+                </tr>
+                {% endif %}
+                <tr id="discrow" style="display: none;">
+                  <td class="text-left" id="discname">{{ button_discount }}</td>
+                  <td class="text-right" id="discount">$0.00</td>
+                </tr>
+                <tr id="couprow" style="display: none;">
+                  <td class="text-left">{{ button_coupon }}</td>
+                  <td class="text-right" id="coupondisc">$0.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <hr class="hr-tag">
+        <div class="table-responsive table-total">
+          <table class="table table-hover margin-bottom-0">
+            <tbody>
+              <tr>
+                <td class="text-left">{{ text_total }}</td>
+                <td class="text-right" id="cartTotal">00.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <button class="col-xs-12 btn" id="button-customer" data-toggle="modal" data-target="#customerSearch"><i class="fa fa-user font-22"></i> <strong class="" id="customer-name">{{ button_customer }}</strong></button>
+        <div class="btn-group" style="width: 100%;">
+          {% if discount_status and coupon_status %}
+          <button class="col-xs-6 btn buttons-sp" data-toggle="modal" data-target="#addDiscount" id="button-discount"><i class="fa fa-minus-square"></i> <strong class="">{{ button_discount }}</strong></button>
+          <button class="col-xs-6 btn buttons-sp" data-toggle="modal" data-target="#addCoupon" id="button-coupon"><i class="fa fa-ticket"></i> <strong class="">{{ button_coupon }}</strong></button>
+          {% else %}
+          {% if discount_status %}
+          <button class="col-xs-12 btn buttons-sp" data-toggle="modal" data-target="#addDiscount" id="button-discount"><i class="fa fa-minus-square"></i> <strong class="">{{ button_discount }}</strong></button>
+          {% endif %}
+          {% if coupon_status %}
+          <button class="col-xs-12 btn buttons-sp" data-toggle="modal" data-target="#addCoupon" id="button-coupon"><i class="fa fa-ticket"></i> <strong class="">{{ button_coupon }}</strong></button>
+          {% endif %}
+          {% endif %}
+        </div>
+        <button class="col-xs-12 btn buttons-sp button-payment btn-checkout"><i class="fa fa-money"></i> <strong class="">{{ text_checkout }}</strong></button>
+        <button class="col-xs-12 btn buttons-sp btn-checkout" data-toggle="modal" data-target="#holdOrder" style="background-color: #f1b40f;"><i class="fa fa-pause"></i> <strong class="">{{ text_hold_order }}</strong></button>
+      </div>
+    </div>
+
+    <div class="pull-right color-white" id="fixed-div">
+      <button class="btn label label-info barcode-scan" data-toggle="modal" data-target="#barcodeScan" title="{{ "Barcode Scan" }}" data-toggle="tooltip" style="margin-left: 5px;"><i class="fa fa-barcode"></i></button>
+      <span id="hold-carts">
+        <button class="btn label label-info" title="{{ text_view_hold }}" data-toggle="tooltip">
+          <span class="fa fa-pause"></span>
+        </button>
+        <div class="label label-danger cart-hold fix-label">0</div>
+      </span>
+      <span id="show-cart">
+        <div class="btn label label-info" title="{{ text_cart_items }}" data-toggle="tooltip">
+          <span class="fa fa-shopping-cart"></span>
+        </div>
+        <div class="label label-danger cart-total fix-label">0</div>
+      </span>
+    </div>
+
+    <div id="customerSearch" class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="product-option-modal" data-dismiss="modal"><i class="fa fa-times"></i></div>
+          <div class="modal-header">
+            <h4 class="modal-title">{{ text_customer_details }}</h4>
+          </div>
+          <div class="modal-body">
+            <div class="searchCustomer">
+              <input type="text" id="searchCustomer" placeholder="{{ entry_search_customer }}" class="form-control" autocomplete="off">
+              <div id="putCustomer">
+              </div>
+            </div>
+            <div class="addCustomer form-horizontal hide">
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-customer-firstname">{{ entry_firstname }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="firstname" value="" placeholder="{{ entry_firstname }}" id="input-customer-firstname" class="form-control" autocomplete="off" />
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-customer-lastname">{{ entry_lastname }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="lastname" value="" placeholder="{{ entry_lastname }}" id="input-customer-lastname" class="form-control" autocomplete="off" />
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-email">{{ entry_email }}</label>
+                <div class="col-sm-10">
+                  <input type="email" name="email" value="" placeholder="{{ entry_email }}" id="input-email" class="form-control" autocomplete="off" />
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-telephone">{{ entry_telephone }}</label>
+                <div class="col-sm-10">
+                  <input type="tel" name="telephone" value="" placeholder="{{ entry_telephone }}" id="input-telephone" class="form-control" autocomplete="off" />
+                </div>
+              </div>
+              <legend>{{ text_address }}</legend>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-address-1">{{ entry_address_1 }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="address_1" value="" placeholder="{{ entry_address_1 }}" id="input-address-1" class="form-control" autocomplete="off" />
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-city">{{ entry_city }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="city" value="" placeholder="{{ entry_city }}" id="input-city" class="form-control" autocomplete="off" />
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-postcode">{{ entry_postcode }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="postcode" value="" placeholder="{{ entry_postcode }}" id="input-postcode" class="form-control" autocomplete="off" />
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-country">{{ entry_country }}</label>
+                <div class="col-sm-10">
+                  <select name="country_id" id="input-country" class="form-control" autocomplete="off">
+                    <option value="">{{ text_select }}</option>
+                    {% for country in countries %}
+                    <option value="{{ country.country_id }}">{{ country.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-zone">{{ entry_zone }}</label>
+                <div class="col-sm-10">
+                  <select name="zone_id" id="input-zone" class="form-control" autocomplete="off">
+                  </select>
+                </div>
+              </div>
+              <div class="text-center">
+                <button class="btn btn-default" onclick="registerCustomer($(this));"><strong>{{ text_register }}</strong></button>
+                <button class="btn btn-default" onclick="registerCustomer($(this), true);"><strong>{{ text_register_select }}</strong></button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success pull-left" id="addCustomer">{{ text_add_customer }}</button>
+            <button type="button" class="btn btn-danger pull-left" id="removeCustomer">{{ text_remove }}</button>
+            <button type="button" class="btn btn-info" data-dismiss="modal">{{ button_close }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="holdOrder" class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="product-option-modal" data-dismiss="modal"><i class="fa fa-times"></i></div>
+          <div class="modal-header">
+            <h4 class="modal-title">{{ heading_hold_note }}</h4>
+          </div>
+          <div class="modal-body">
+            <textarea class="form-control" placeholder="{{ entry_hold_note }}" id="holdNote" rows="4"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success pull-left" onclick="holdOrder();">{{ button_hold_order }}</button>
+            <button type="button" class="btn btn-info" data-dismiss="modal">{{ button_cancel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <span data-toggle="modal" data-target="#productOptions" id="buttonModal"></span>
+    <div id="productOptions" class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="product-option-modal" data-dismiss="modal"><i class="fa fa-times"></i></div>
+          <div class="modal-header">
+            <h4 class="modal-title" id="global-modal-title">{{ text_product_options }}</h4>
+          </div>
+          <div class="modal-body color-black" id="posProductOptions">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-info" data-dismiss="modal">{{ button_close }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <span data-toggle="modal" data-target="#productDetails" id="buttonProductDetails"></span>
+    <div id="productDetails" class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="product-option-modal" data-dismiss="modal"><i class="fa fa-times"></i></div>
+          <div class="modal-header">
+            <h4 class="modal-title">{{ heading_product_detail }}</h4>
+          </div>
+          <div class="modal-body color-black">
+            <img src="" class="img-responsive" style="margin: 0 auto" id="detail-image">
+            <div class="table-responsive">
+              <table class="table table-hover margin-bottom-0">
+                <tbody>
+                  <tr>
+                    <td class="text-right">{{ entry_name }}</td>
+                    <td class="text-left" id="productName"></td>
+                  </tr>
+                  <tr>
+                    <td class="text-right">{{ entry_price }}</td>
+                    <td class="text-left" id="productPrice"></td>
+                  </tr>
+                  <tr>
+                    <td class="text-right">{{ entry_item_left }}</td>
+                    <td class="text-left" id="productItem"></td>
+                  </tr>
+                  <tr id="supplier-info">
+                    <td class="text-right">{{ entry_suppliers }}:</td>
+                    <td class="text-left" id="productSuppliers"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-info" data-dismiss="modal">{{ button_close }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="categoryList" class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="product-option-modal" data-dismiss="modal"><i class="fa fa-times"></i></div>
+          <div class="modal-header">
+            <h4 class="modal-title">{{ heading_category }}</h4>
+          </div>
+          <div class="modal-body color-black">
+            <button class="btn btn-default" onclick="showAllProducts()">{{ button_show_product }}</button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-info" data-dismiss="modal">{{ button_close }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="barcodeScan" class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="product-option-modal" data-dismiss="modal"><i class="fa fa-times"></i></div>
+          <div class="modal-header">
+            <h4 class="modal-title">{{ heading_scan_barcode }}</h4>
+          </div>
+          <div class="modal-body color-black">
+            <input type="text" id="bar-code" placeholder="{{ entry_barcode }}" class="form-control">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-info" data-dismiss="modal">{{ button_close }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="addDiscount" class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-md">
+        <div class="modal-content">
+          <div class="product-option-modal" data-dismiss="modal"><i class="fa fa-times"></i></div>
+          <div class="modal-header">
+            <h4 class="modal-title">{{ heading_discount }}</h4>
+          </div>
+          <div class="modal-body color-black">
+            <div class="row">
+              <div class="col-sm-3 text-center">
+                <strong>Fixed</strong>
+                <div class="input-group input-group2">
+                  {% if symbol_position == 'L' %}
+                  <span class="input-group-addon currency"><strong>{{ currency_code }}</strong></span>
+                  {% else %}
+                  <span class="input-group-addon currency" style="display: none;"><strong>{{ currency_code }}</strong></span>
+                  {% endif %}
+                  <input type="text" id="fixedDisc" value="0" placeholder="{{ entry_fixed }}" class="form-control" onkeypress="return validate(event, this)">
+                  {% if symbol_position == 'R' %}
+                  <span class="input-group-addon currency"><strong>{{ currency_code }}</strong></span>
+                  {% else %}
+                  <span class="input-group-addon currency" style="display: none;"><strong>{{ currency_code }}</strong></span>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-sm-1 text-center" style="margin: 28px 0;">
+                <i class="fa fa-plus"></i>
+              </div>
+              <div class="col-sm-3 text-center">
+                <strong>{{ entry_percent }}</strong>
+                <div class="input-group">
+                  <input type="text" id="percentDisc" value="0" placeholder="{{ entry_percent }}" class="form-control" onkeypress="return validate(event, this)" style="border-radius: 0;">
+                  <span class="input-group-addon"><strong>%</strong></span>
+                </div>
+              </div>
+              <div class="col-sm-1 text-center" style="margin: 28px 0; font-size: 20px;">
+                <strong>=</strong>
+              </div>
+              <div class="col-sm-4 text-center">
+                <strong>{{ text_total }}</strong>
+                <div class="input-group input-group3" style="margin-top: 3px;">
+                  {% if symbol_position == 'L' %}
+                  <span class="input-group-addon currency"><strong>{{ currency_code }}</strong></span>
+                  {% else %}
+                  <span class="input-group-addon currency" style="display: none;"><strong>{{ currency_code }}</strong></span>
+                  {% endif %}
+                  <span class="input-group-addon" style="max-width: 140px; overflow: hidden;"><strong id="total-discount">0.00</strong></span>
+                  {% if symbol_position == 'R' %}
+                  <span class="input-group-addon currency"><strong>{{ currency_code }}</strong></span>
+                  {% else %}
+                  <span class="input-group-addon currency" style="display: none;"><strong>{{ currency_code }}</strong></span>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-sm-12">
+                <label class="col-sm-3" for="input-discname">{{ entry_discount }}</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="input-discname" placeholder="{{ entry_discount }}" value="{{ button_discount }}">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-12 text-center" style="float: none;">
+              <button type="button" class="btn buttons-sp" id="addDiscountbtn">{{ button_apply }}</button>
+              <button type="button" class="btn buttons-sp" id="removeDiscount" style="background-color: #ff6666;">{{ button_remove }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="addCoupon" class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="product-option-modal" data-dismiss="modal"><i class="fa fa-times"></i></div>
+          <div class="modal-header">
+            <h4 class="modal-title">{{ heading_coupon }}</h4>
+          </div>
+          <div class="modal-body color-black">
+            <div class="form-group">
+              <input type="text" id="coupon-code" class="form-control" placeholder="{{ entry_coupon }}">
+            </div>
+            <div class="col-sm-12 text-center" style="float: none;">
+              <button type="button" class="btn buttons-sp" id="addCouponbtn">{{ button_apply }}</button>
+              <button type="button" class="btn buttons-sp" id="removeCoupon" style="background-color: #ff6666;">{{ button_remove }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="updatePrice" class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="product-option-modal" data-dismiss="modal"><i class="fa fa-times"></i></div>
+          <div class="modal-header">
+            <h4 class="modal-title">{{ heading_price_update }}</h4>
+          </div>
+          <div class="modal-body color-black">
+            <div class="form-group">
+              <label id="update-label"></label>
+              <input type="text" id="update-price" class="form-control" placeholder="{{ entry_updated_price }}" onkeypress="return validate(event, this)">
+              <input type="hidden" id="cart-index">
+            </div>
+            <div class="col-sm-12 text-center" style="float: none;">
+              <button type="button" class="btn buttons-sp" id="updatePricebtn">{{ button_apply }}</button>
+              <button type="button" class="btn buttons-sp" id="cancelPriceUp" style="background-color: #ff6666;">{{ button_remove }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="addProduct" class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-md">
+        <div class="modal-content">
+          <div class="product-option-modal" data-dismiss="modal"><i class="fa fa-times"></i></div>
+          <div class="modal-header">
+            <h4 class="modal-title">{{ heading_add_product }}</h4>
+          </div>
+          <div class="modal-body color-black form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-3 control-label">{{ entry_product_name }}</label>
+              <div class="col-sm-9">
+                <input type="text" name="product_name" class="form-control" placeholder="{{ entry_product_name }}">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-3 control-label">{{ entry_product_price }}</label>
+              <div class="col-sm-9">
+                <input type="text" name="product_price" class="form-control" placeholder="{{ entry_product_price }}" onkeypress="return validate(event, this)">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-3 control-label">{{ entry_product_quantity }}</label>
+              <div class="col-sm-9">
+                <input type="text" name="product_quantity" class="form-control" placeholder="{{ entry_product_quantity }}" onkeypress="return validate(event, this, true)">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer color-black">
+            <div class="col-sm-12 text-center" style="float: none;">
+              <button type="button" class="btn buttons-sp" id="addProductbtn">{{ button_add }}</button>
+              <button type="button" class="btn buttons-sp" data-dismiss="modal" style="background-color: #ff6666;">{{ button_cancel }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="loader">
+      <div class="cp-spinner cp-eclipse"></div>
+      <div class="progress"><div class="progress-bar progress-bar-dan"></div></div>
+      <div id="loading-text"></div>
+      <div id="error-text"></div>
+    </div>
+    <div class="posProductBlock"><img src="{{ no_image }}" width="50" height="50"></div>
+    <div id="screen-div" onclick="toggleFullScreen();" title="Toggle Screen" data-toggle="tooltip">
+      <img src="{{ screen_image }}">
+    </div>
+  </div>
+  <div class="hide" id="printBill" style="color:#000 !important;">
+    <div class="container" style="text-align: center; max-width: 630px; font-weight:400">
+      <div class="thermal" style="margin: 0 auto;">
+        {% if show_store_logo %}
+        <img src="{{ store_logo }}" title="{{ store_name }}" alt="{{ store_name }}" class="img-responsive" width="200" style="margin: 0 auto;"><br>
+        {% endif %}
+        {% if show_store_name %}
+        <span style="font-size: 14px;">{{ store_name }}</span><br>
+        {% endif %}
+        {% if show_store_address %}
+        <span style="font-size: 11px;">{{ store_address }}</span><br>
+        {% endif %}
+        {% if store_detail %}
+        <span style="font-size: 11px;">{{ store_detail }}</span><br>
+        {% endif %}
+        {% if show_order_date %}
+        {{ text_date }}: <span class="order-date"></span>
+        {% endif %}
+        {% if show_order_time %}
+        {{ text_time }}: <span class="order-time"></span><br>
+        {% endif %}
+        {% if show_order_id %}
+        <span class="order-txn">{{ text_order_id }}</span> #<span class="oid"></span>
+        {% endif %}
+        {% if show_cashier_name %}
+        {{ text_cashier }}: <span id="cashier-name"></span>
+        {% endif %}
+      </div>
+      <br>
+      <div class="thermal">
+        {% if show_shipping_mode %}
+        <span>{{ text_shipping_mode }}: </span><span class="oshipping">{{ text_pickup }}</span><br>
+        {% endif %}
+        {% if show_payment_mode %}
+        <span>{{ text_payment_mode }}: </span><span class="opayment"></span>
+        {% endif %}
+      </div>
+      <div class="table thermal">
+        <table style="border-collapse: separate; border-spacing: 5px; margin: 0 auto; width: 95%;">
+          <thead>
+            <tr>
+              <td style="text-align: left">{{ column_product }}</td>
+              <td>{{ column_quantity }}</td>
+              <td>{{ column_price }}</td>
+              <td style="text-align: left;">{{ column_amount }}</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+                <td style="text-align: left">------------------</td>
+                <td>----</td>
+                <td>-----------</td>
+                <td style="text-align: left;">----------</td>
+            </tr>
+          </tbody>
+          <tbody id="receiptProducts">
+          </tbody>
+          <tbody>
+            <tr>
+              <td colspan="4">---------------------------------------------------------</td>
+            </tr>
+          </tbody>
+          <tbody id="print-totals">
+            <tr>
+              <td></td>
+              <td></td>
+              <td>{{ text_subtotal }}</td>
+              <td style="text-align: left;">00.00</td>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr>
+              <td id="total-quantity-text"></td>
+              <td id="total-quantity" style="font-weight: bold;"></td>
+              <td>{{ text_grandtotal }}</td>
+              <td style="text-align: left;"><b class="oTotal">00.00</b></td>
+            </tr>
+          </tbody>
+        </table>
+        {% if show_note %}
+        <div style="text-align: left;">
+          <strong>{{ text_note }}: </strong><span class="onote"></span>
+        </div>
+        {% endif %}
+        <span>{{ text_nice_day }}</span><br>
+        <span>{{ text_thank_you }}</span>
+      </div>
+    </div>
+  </div>
+  <noscript>
+    <div class="no-js">{{ text_no_js }}</div>
+  </noscript>
+</body>
+<script language="JavaScript">
+  window.onbeforeunload = confirmExit;
+  function confirmExit() {
+    return "{{ text_close_warning }}";
+  }
+</script>
+<script type="text/javascript">
+var currency = '{{ currency }}',
+currency_code = '{{ currency_code }}',
+symbol_position = '{{ symbol_position }}',
+user_login = '{{ user_login }}',
+tax_status = '{{ tax_status }}',
+message_error_credentials = '{{ error_credentials }}',
+entry_price = '{{ entry_price }}',
+text_loading_products = '{{ text_loading_products }}',
+error_load_products = '{{ error_load_products }}',
+text_loading_populars = '{{ text_loading_populars }}',
+error_load_populars = '{{ error_load_populars }}',
+text_loading_orders = '{{ text_loading_orders }}',
+error_load_orders = '{{ error_load_orders }}',
+text_loading_customers = '{{ text_loading_customers }}',
+error_load_customers = '{{ error_load_customers }}',
+text_loading_categories = '{{ text_loading_categories }}',
+error_load_categories = '{{ error_load_categories }}',
+text_select = '{{ text_select }}',
+text_none = '{{ text_none }}',
+text_loading = '{{ text_loading }}',
+button_upload = '{{ button_upload }}',
+button_cart = '{{ button_cart }}',
+text_product_options = "{{ text_product_options }}",
+error_keyword = '{{ error_keyword }}',
+error_products = '{{ error_products }}',
+text_online_mode = '{{ text_online_mode }}',
+text_online = '{{ text_online }}',
+error_enter_online = '{{ error_enter_online }}',
+text_offline_mode = '{{ text_offline_mode }}',
+text_offline = '{{ text_offline }}',
+error_no_category_product = '{{ error_no_category_product }}',
+error_no_customer = '{{ error_no_customer }}',
+text_select_customer = '{{ text_select_customer }}',
+error_customer_add = '{{ error_add_customer }}',
+text_remove_customer = '{{ text_remove_customer }}',
+error_checkout = '{{ error_checkout }}',
+text_balance_due = '{{ text_balance_due }}',
+text_order_success = '{{ text_order_success }}',
+text_customer_select = '{{ text_customer_select }}',
+guest_name = '{{ guest_name }}',
+text_item_detail = '{{ text_item_details }}',
+text_sync_order = '{{ text_sync_orders }}',
+text_no_orders = '{{ text_no_orders }}',
+error_sync_orders = '{{ error_sync_orders }}',
+text_another_cart = '{{ text_select_cart }}',
+text_cart_deleted = '{{ text_cart_deleted }}',
+text_current_deleted = '{{ text_current_deleted }}',
+text_cart_empty = '{{ text_cart_empty }}',
+text_empty_cart = '{{ text_empty_cart }}',
+text_cart_add = '{{ text_cart_add }}',
+text_option_required = '{{ text_option_required }}',
+text_no_quantity = '{{ text_no_quantity }}',
+text_product_added = '{{ text_product_added }}',
+text_product_not_added = '{{ text_product_not_added }}',
+text_product_removed = '{{ text_product_removed }}',
+cash_payment_title = '{{ cash_payment_title }}',
+text_order_id = '{{ text_order_id }}',
+text_all_products = '{{ text_all_products }}',
+text_search = '{{ text_search }}',
+text_option_notifier = '{{ text_option_notifier }}',
+show_lowstock_prod = '{{ show_lowstock_prod }}',
+low_stock = '{{ low_stock }}',
+text_low_stock = '{{ text_low_stock }}',
+text_special_price = '{{ text_special_price }}',
+text_empty_hold = '{{ text_empty_hold }}',
+text_success_logout = '{{ text_success_logout }}',
+text_cust_add_select = '{{ text_cust_add_select }}',
+text_register = '{{ text_register }}',
+text_register_select = '{{ text_register_select }}',
+error_save_setting = '{{ error_save_setting }}',
+base_pos = '{{ base_pos }}',
+text_tendered_confirm = '{{ text_tendered_confirm }}',
+text_card_confirm = '{{ text_card_confirm }}',
+text_product_success = '{{ text_product_success }}',
+error_product_name = '{{ error_product_name }}',
+error_product_price = '{{ error_product_price }}',
+error_product_quant = '{{ error_product_quant }}',
+error_request_offline = '{{ error_request_offline }}',
+error_supplier_range = '{{ error_supplier_range }}',
+text_no_quantity_added = '{{ text_no_quantity_added }}',
+error_select_product = '{{ error_select_product }}',
+text_sure = '{{ text_sure }}',
+text_success_price_up = '{{ text_success_price_up }}',
+text_price_remove = '{{ text_price_remove }}',
+text_success = '{{ text_success }}',
+text_warning = '{{ text_warning }}',
+error_warning = '{{ error_warning }}',
+text_coupon_remove = '{{ text_coupon_remove }}',
+text_no_product = '{{ text_no_product }}',
+text_success_add_disc = '{{ text_success_add_disc }}',
+text_success_rem_disc = '{{ text_success_rem_disc }}',
+error_cart_discount = '{{ error_cart_discount }}',
+error_coupon_offline = '{{ error_coupon_offline }}',
+error_supplier = '{{ error_supplier }}',
+error_no_supplier = '{{ error_no_supplier }}',
+heading_price_update = '{{ heading_price_update }}',
+button_product_info = '{{ button_product_info }}',
+error_mobile_view = '{{ error_mobile_view }}',
+cashier = '{{ name }}',
+error_script = '{{ error_script }}',
+error_price = '{{ error_price }}',
+text_option_required_date = '{{ text_option_required_date }}';
+</script>
+</html>

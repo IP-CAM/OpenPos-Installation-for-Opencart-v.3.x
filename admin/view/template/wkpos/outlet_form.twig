@@ -1,0 +1,496 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-outlet" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_form }}</h3>
+      </div>
+      <div class="panel-body">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+          {% if outlet_id %}
+          <li><a href="#tab-products" data-toggle="tab">{{ tab_product }}</a></li>
+          {% endif %}
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="tab-general">
+            <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-outlet" class="form-horizontal">
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-name">{{ entry_oname }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_oname }}" id="input-name" class="form-control" />
+                  {% if error_name %}
+                  <div class="text-danger">{{ error_name }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-address">{{ entry_address }}</label>
+                <div class="col-sm-10">
+                  <textarea name="address" placeholder="{{ entry_address }}" id="input-address" class="form-control" rows="6">{{ address }}</textarea>
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-country">{{ entry_country }}</label>
+                <div class="col-sm-10">
+                  <select name="country_id" id="input-country" class="form-control">
+                    <option value="">{{ text_select }}</option>
+                    {% for country in countries %}
+                    {% if country['country_id'] == country_id %}
+                    <option value="{{ country['country_id'] }}" selected="selected">{{ country['name'] }}</option>
+                    {% else %}
+                    <option value="{{ country['country_id'] }}">{{ country['name'] }}</option>
+                    {% endif %}
+                    {% endfor %}
+                  </select>
+                  {% if error_country %}
+                  <div class="text-danger">{{ error_country }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group required">
+                <label class="col-sm-2 control-label" for="input-zone">{{ entry_zone }}</label>
+                <div class="col-sm-10">
+                  <select name="zone_id" id="input-zone" class="form-control">
+                  </select>
+                  {% if error_zone %}
+                  <div class="text-danger">{{ error_zone }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-status">{{ entry_ostatus }}</label>
+                <div class="col-sm-10">
+                  <select name="status" id="input-status" class="form-control">
+                    {% if status %}
+                    <option value="1" selected="selected">{{ text_enabled }}</option>
+                    <option value="0">{{ text_disabled }}</option>
+                    {% else %}
+                    <option value="1">{{ text_enabled }}</option>
+                    <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% endif %}
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+          {% if outlet_id %}
+          <div class="tab-pane" id="tab-products">
+            <div style="text-align: center">
+              <a href="{{ assignAll }}" class="btn btn-info" style="margin-bottom: 10px">{{ button_assign_all }}</a>
+            </div>
+            <div class="well">
+              <div class="row">
+                <div class="col-sm-3">
+                  <div class="form-group">
+                    <label class="control-label" for="input-name">{{ entry_name }}</label>
+                    <input type="text" name="filter_name" value="" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="form-group">
+                    <label class="control-label" for="input-model">{{ entry_model }}</label>
+                    <input type="text" name="filter_model" value="" placeholder="{{ entry_model }}" id="input-model" class="form-control" />
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="form-group">
+                    <label class="control-label" for="input-price">{{ entry_price }}</label>
+                    <input type="text" name="filter_price" value="" placeholder="{{ entry_price }}" id="input-price" class="form-control" />
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="form-group">
+                    <label class="control-label" for="input-status">{{ entry_status }}</label>
+                    <select name="filter_status" id="input-status" class="form-control">
+                      <option value=""></option>
+                      <option value="1">{{ text_enabled }}</option>
+                      <option value="0">{{ text_disabled }}</option>
+                    </select>
+                  </div>
+                  <button type="button" id="button-filter" class="btn btn-primary pull-right"><i class="fa fa-search"></i> {{ button_filter }}</button>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <td class="text-center">{{ column_image }}</td>
+                    <td class="text-left">{{ column_name }}</td>
+                    <td class="text-left">{{ column_model }}</td>
+                    <td class="text-right">{{ column_price }}</td>
+                    <td class="text-right">{{ column_quantity }}</td>
+                    <td class="text-left">{{ column_status }}</td>
+                    <td class="text-left" style="width: 120px;">{{ column_pos_status }}</td>
+                    <td class="text-right" style="width: 100px;">{{ column_assign }}</td>
+                  </tr>
+                </thead>
+                <tbody id="productBody">
+                  <tr></tr>
+                </tbody>
+                <tfoot>
+                  <tr><td colspan="8" class="alert-info text-center" id="productFoot"></td></tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% if outlet_id %}
+<script type="text/javascript" src="../wkpos/js/toast.js"></script>
+<script type="text/javascript" src="../wkpos/js/hash.js"></script>
+<script type="text/javascript"><!--
+$('input[name=\'filter_name\']').autocomplete({
+  'source': function(request, response) {
+    $.ajax({
+      url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+      dataType: 'json',
+      success: function(json) {
+        response($.map(json, function(item) {
+          return {
+            label: item['name'],
+            value: item['product_id']
+          }
+        }));
+      },
+      error: function () {
+        location = 'index.php?route=wkpos/products&user_token={{ user_token }}';
+      }
+    });
+  },
+  'select': function(item) {
+    $('input[name=\'filter_name\']').val(item['label']);
+    $('#button-filter').trigger('click');
+  }
+});
+
+$('input[name=\'filter_model\']').autocomplete({
+  'source': function(request, response) {
+    $.ajax({
+      url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_model=' +  encodeURIComponent(request),
+      dataType: 'json',
+      success: function(json) {
+        response($.map(json, function(item) {
+          return {
+            label: item['model'],
+            value: item['product_id']
+          }
+        }));
+      },
+      error: function () {
+        location = 'index.php?route=wkpos/products&user_token={{ user_token }}';
+      }
+    });
+  },
+  'select': function(item) {
+    $('input[name=\'filter_model\']').val(item['label']);
+    $('#button-filter').trigger('click');
+  }
+});
+//--></script>
+<script type="text/javascript"><!--
+  $('#button-filter').on('click', function() {
+    filter_name = $('input[name=\'filter_name\']').val();
+    if (filter_name) {
+      setHash('filter_name', filter_name);
+    } else {
+      removeHash('filter_name');
+    }
+
+    filter_model = $('input[name=\'filter_model\']').val();
+    if (filter_model) {
+      setHash('filter_model', filter_model);
+    } else {
+      removeHash('filter_model');
+    }
+
+    filter_price = $('input[name=\'filter_price\']').val();
+    if (filter_price) {
+      setHash('filter_price', filter_price);
+    } else {
+      removeHash('filter_price');
+    }
+
+    filter_status = $('select[name=\'filter_status\']').val();
+    if (filter_status) {
+      setHash('filter_status', filter_status);
+    } else {
+      removeHash('filter_status');
+    }
+
+    product_listed = 0;
+    product_prev = 0;
+    start = 0;
+    all = false;
+    $('#productBody').html('<tr></tr>');
+    $('#productFoot').html('');
+    loadProducts();
+  });
+  var order = 'ASC';
+  var sort = 'pd.name';
+  var filter_name = '', filter_model = '', filter_price = '', filter_status = '';
+  var product_listed = 0;
+  var product_prev = 0;
+  var start = 0;
+  var all = false;
+  var in_process = false;
+  var outlet = {{ outlet_id }};
+
+  function loadProducts() {
+    var product_data = {
+      start: start,
+      outlet: outlet,
+      order: order,
+      sort: sort,
+      filter_name: filter_name,
+      filter_model: filter_model,
+      filter_price: filter_price,
+      filter_status: filter_status
+    };
+    $.ajax({
+      url: 'index.php?route=wkpos/products/loadProducts&user_token={{ user_token }}',
+      data: product_data,
+      type: 'post',
+      dataType: 'json',
+      beforeSend: function () {
+        $('#productFoot').append(' <i class="fa fa-spin fa-spinner"></i>');
+        in_process = true;
+      },
+      success: function(json) {
+        in_process = false;
+        if (json['success']) {
+          var product_html = '';
+          var products = json['products'];
+          for (var i = 0; i < products.length; i++) {
+            product_listed ++;
+            product_html += '<tr product-id="' + products[i]['product_id'] + '">';
+
+            product_html += '  <td class="text-center">';
+            if (products[i]['image']) {
+              product_html += '    <img src="' + products[i]['image'] + '" alt="' + products[i]['name'] + '" class="img-thumbnail" />';
+            } else {
+              product_html += '    <span class="img-thumbnail list"><i class="fa fa-camera fa-2x"></i></span>';
+            }
+            product_html += '    </td>';
+            product_html += '  <td class="text-left">' + products[i]['name'] + '</td>';
+            product_html += '  <td class="text-left">' + products[i]['model'] + '</td>';
+            product_html += '  <td class="text-right">';
+            if (products[i]['special']) {
+              product_html += '    <span style="text-decoration: line-through;">' + products[i]['price'] + '</span><br/>';
+              product_html += '    <div class="text-danger">' + products[i]['special'] + '</div>';
+            } else {
+              product_html += '    ' + products[i]['price'] + '';
+            }
+            product_html += '  <td class="text-right">';
+            if (products[i]['quantity'] <= 0) {
+              product_html += '    <span class="label label-warning">' + products[i]['quantity'] + '</span>';
+            } else if (products[i]['quantity'] <= 5) {
+              product_html += '    <span class="label label-danger">' + products[i]['quantity'] + '</span>';
+            } else {
+              product_html += '    <span class="label label-success">' + products[i]['quantity'] + '</span>';
+            }
+            product_html += '  <td class="text-left">' + products[i]['status'] + '</td>';
+            product_html += '  <td class="text-left"><select class="form-control posStatus">';
+            if (products[i]['pos_status'] == 1) {
+              product_html += '<option value="0">{{ text_disabled }}</option>';
+              product_html += '<option value="1" selected="selected">{{ text_enabled }}</option>';
+            } else {
+              product_html += '<option value="0" selected="selected">{{ text_disabled }}</option>';
+              product_html += '<option value="1">{{ text_enabled }}</option>';
+            }
+            product_html += '  </select></td>';
+            product_html += '  <td class="text-right"><input type="text" class="assignQuantity form-control" value="' + products[i]['pos_quantity'] + '"></td>';
+
+            product_html += '</tr>';
+            if (product_listed == json['product_total']) {
+              all = true;
+            }
+          }
+          $('#productBody').append(product_html);
+          $('#productFoot').text('Showing ' + product_listed + ' of ' + json['product_total']);
+        } else {
+          $('#productBody').html('<tr></tr>');
+          $('#productFoot').text('{{ text_no_products }}');
+        }
+      },
+      error: function () {
+        in_process = false;
+        location = 'index.php?route=wkpos/outlets&outlet_id={{ outlet_id }}&user_token={{ user_token }}';
+      }
+    });
+  }
+
+  $(window).on('scroll', function () {
+    var diff = $(document).height() - $(window).height();
+    var foot = diff - $(window).scrollTop();
+
+    if ((foot < 200) && !in_process) {
+      start = product_listed;
+
+      if (product_listed && (product_listed != product_prev) && !all) {
+        loadProducts();
+        product_prev = product_listed;
+      }
+    };
+  });
+
+  $('body').on('change', '.assignQuantity', function () {
+    var thisthis = $(this);
+    var product_id = thisthis.parent().parent().attr('product-id');
+    var quantity = thisthis.val();
+
+    $.ajax({
+      url: 'index.php?route=wkpos/products/assignQuantity&user_token={{ user_token }}',
+      data: {product_id: product_id, quantity: quantity, outlet: outlet},
+      type: 'post',
+      dataType: 'json',
+      beforeSend: function () {
+        thisthis.addClass('alert-warning');
+      },
+      success: function(json) {
+        thisthis.removeClass('alert-warning');
+        if (json['success']) {
+          $.toaster({
+              priority: 'success',
+              title: 'Notice',
+              message: json['success'],
+              timeout: 3000
+          });
+        }
+        if (json['error']) {
+          $.toaster({
+              priority: 'warning',
+              title: 'Notice',
+              message: json['error'],
+              timeout: 3000
+          });
+        }
+      },
+      error: function () {
+        location = 'index.php?route=wkpos/outlets&outlet_id={{ outlet_id }}&user_token={{ user_token }}';
+      }
+    });
+  });
+
+  $('body').on('change', '.posStatus', function () {
+    var thisthis = $(this);
+    var product_id = thisthis.parent().parent().attr('product-id');
+    var status = thisthis.val();
+
+    $.ajax({
+      url: 'index.php?route=wkpos/products/changeStatus&user_token={{ user_token }}',
+      data: {product_id: product_id, status: status, outlet: outlet},
+      type: 'post',
+      dataType: 'json',
+      beforeSend: function () {
+        thisthis.addClass('alert-warning');
+      },
+      success: function(json) {
+        thisthis.removeClass('alert-warning');
+        if (json['success']) {
+          $.toaster({
+              priority: 'success',
+              title: 'Notice',
+              message: json['success'],
+              timeout: 3000
+          });
+        }
+      },
+      error: function () {
+        location = 'index.php?route=wkpos/outlets&outlet_id={{ outlet_id }}&user_token={{ user_token }}';
+      }
+    });
+  });
+
+  $(document).ready(function () {
+    checkTab = getHash('tab');
+    if (checkTab) {
+      $('a[href="#tab-' + checkTab + '"]').trigger('click');
+
+      var checkFilterName = getHash('filter_name');
+      if (checkFilterName) {
+        filter_name = checkFilterName.replace(/%20/g, " ");
+        $('input[name=\'filter_name\']').val(filter_name);
+      }
+      var checkFilterModel = getHash('filter_model');
+      if (checkFilterModel) {
+        filter_model = checkFilterModel.replace(/%20/g, " ");
+        $('input[name=\'filter_model\']').val(filter_model);
+      }
+      var checkFilterPrice = getHash('filter_price');
+      if (checkFilterPrice) {
+        filter_price = checkFilterPrice;
+        $('input[name=\'filter_price\']').val(filter_price);
+      }
+      var checkFilterStatus = getHash('filter_status');
+      if (checkFilterStatus) {
+        filter_status = checkFilterStatus;
+        $('select[name=\'filter_status\'] option[value="' + filter_status + '"]').prop('selected', true);
+      }
+      loadProducts();
+    }
+  });
+</script>
+{% endif %}
+<script type="text/javascript">
+$('select[name=\'country_id\']').on('change', function() {
+  $.ajax({
+    url: 'index.php?route=localisation/country/country&user_token={{ user_token }}&country_id=' + this.value,
+    dataType: 'json',
+    beforeSend: function() {
+      $('select[name=\'country_id\']').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
+    },
+    complete: function() {
+      $('.fa-spin').remove();
+    },
+    success: function(json) {
+      html = '<option value="">{{ text_select }}</option>';
+
+      if (json['zone'] && json['zone'] != '') {
+        for (i = 0; i < json['zone'].length; i++) {
+          html += '<option value="' + json['zone'][i]['zone_id'] + '"';
+
+          if (json['zone'][i]['zone_id'] == '{{ zone_id }}') {
+            html += ' selected="selected"';
+          }
+
+          html += '>' + json['zone'][i]['name'] + '</option>';
+        }
+      } else {
+        html += '<option value="0" selected="selected">{{ text_none }}</option>';
+      }
+
+      $('select[name=\'zone_id\']').html(html);
+    },
+    error: function(xhr, ajaxOptions, thrownError) {
+      alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+    }
+  });
+});
+
+$('select[name=\'country_id\']').trigger('change');
+</script>
+{{ footer }}

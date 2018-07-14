@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<modification>
+  <name>POS Module</name>
+  <version>1.0.0</version>
+  <code>wkpos</code>
+  <author>Webkul</author>
+  <link>http://webkul.com</link>
+  <file path="admin/language/en-gb/common/column_left.php">
+    <operation>
+      <search><![CDATA[
+        // Text
+      ]]></search>
+      <add position="after"><![CDATA[
+/**
+ * POS language
+ */
+$_['text_pos']                         = 'Point of Sale (POS)';
+$_['text_pos_users']                   = 'POS Users';
+$_['text_pos_outlets']                 = 'POS Outlets';
+$_['text_pos_products']                = 'POS Products';
+$_['text_pos_orders']                  = 'POS Orders';
+$_['text_pos_suppliers']               = 'POS Suppliers';
+$_['text_pos_supply']                  = 'Supply Management';
+$_['text_pos_supply_requests']         = 'POS Supply Requests';
+/**
+ * Ends here
+ */
+        ]]></add>
+    </operation>
+  </file>
+
+  <file path="admin/controller/common/column_left.php">
+          <operation>
+                  <search><![CDATA[
+        // Catalog
+                  ]]></search>
+                  <add position="before"><![CDATA[
+  // POS Module Code
+
+      if ($this->config->get('module_wkpos_status')) {
+
+          $pos = array();
+
+          $pos_users = array();
+
+          $pos_supply = array();
+
+          if ($this->user->hasPermission('access', 'wkpos/products')) {
+              $pos[] = array(
+                  'name'     => $this->language->get('text_pos_products'),
+                  'href'     => $this->url->link('wkpos/products', 'user_token=' . $this->session->data['user_token'], true),
+                  'children' => array()
+              );
+          }
+
+          if ($this->user->hasPermission('access', 'wkpos/orders')) {
+              $pos[] = array(
+                  'name'     => $this->language->get('text_pos_orders'),
+                  'href'     => $this->url->link('wkpos/orders', 'user_token=' . $this->session->data['user_token'], true),
+                  'children' => array()
+              );
+          }
+
+          if ($this->user->hasPermission('access', 'wkpos/user')) {
+              $pos_users[] = array(
+                  'name'     => $this->language->get('text_pos_users'),
+                  'href'     => $this->url->link('wkpos/user', 'user_token=' . $this->session->data['user_token'], true),
+                  'children' => array()
+              );
+          }
+
+          if ($this->user->hasPermission('access', 'wkpos/outlets')) {
+              $pos_users[] = array(
+                  'name'     => $this->language->get('text_pos_outlets'),
+                  'href'     => $this->url->link('wkpos/outlets', 'user_token=' . $this->session->data['user_token'], true),
+                  'children' => array()
+              );
+          }
+
+          $pos[] = array(
+              'name'     => $this->language->get('text_users'),
+              'href'     => '',
+              'children' => $pos_users
+          );
+
+          if ($this->user->hasPermission('access', 'wkpos/suppliers')) {
+              $pos_supply[] = array(
+                  'name'     => $this->language->get('text_pos_suppliers'),
+                  'href'     => $this->url->link('wkpos/suppliers', 'user_token=' . $this->session->data['user_token'], true),
+                  'children' => array()
+              );
+          }
+
+          if ($this->user->hasPermission('access', 'wkpos/supply_request')) {
+              $pos_supply[] = array(
+                  'name'     => $this->language->get('text_pos_supply_requests'),
+                  'href'     => $this->url->link('wkpos/supply_request', 'user_token=' . $this->session->data['user_token'], true),
+                  'children' => array()
+              );
+          }
+
+          $pos[] = array(
+              'name'     => $this->language->get('text_pos_supply'),
+              'href'     => '',
+              'children' => $pos_supply
+          );
+
+          if ($pos) {
+              $data['menus'][] = array(
+                  'id'       => 'menu-pos',
+                  'icon'     => 'fa-balance-scale',
+                  'name'     => $this->language->get('text_pos'),
+                  'href'     => '',
+                  'children' => $pos
+              );
+          }
+
+      }
+
+      // pos code ends here
+                  ]]></add>
+          </operation>
+  </file>
+
+  <file path="system/library/cart/cart.php">
+    <operation>
+      <search><![CDATA[
+        $recurring_query = $this->db->query
+      ]]></search>
+      <add position="before"><![CDATA[
+        /**
+         * POS quantity management code
+         */
+        if ($this->config->get('module_wkpos_status') && !$this->config->get('wkpos_show_whole')) {
+          $pos_product = $this->db->query("SELECT SUM(quantity) as quantity FROM " . DB_PREFIX . "wkpos_products WHERE product_id = '" . $product_query->row['product_id'] . "'")->row;
+
+          if (isset($pos_product['quantity'])) {
+            if (!$product_query->row['quantity'] || (($product_query->row['quantity'] - $pos_product['quantity']) < $cart['quantity'])) {
+              $stock = false;
+            }
+          }
+        }
+        /**
+         * POS code ends here
+         */
+      ]]></add>
+    </operation>
+  </file>
+
+  <file path="catalog/model/checkout/order.php">
+    <operation>
+      <search><![CDATA[
+        foreach ($emails as $email) {
+      ]]></search>
+      <add position="before"><![CDATA[
+      					// pos code for sending mail to cashier mail
+      					if ($this->config->get('wkpos_email_agent') && isset($this->session->data['wkpos_cashier_mail'])) {
+      						$emails[] = $this->session->data['wkpos_cashier_mail'];
+      						unset($this->session->data['wkpos_cashier_mail']);
+      					}
+      					// pos code ends here
+      ]]></add>
+    </operation>
+    <operation>
+      <search><![CDATA[
+        // Confirm coupon
+      ]]></search>
+      <add position="after"><![CDATA[
+      					// pos code for restricting fraud status for coupons
+    						if (isset($this->request->post['coupon']) && ($order_total['code'] == 'coupon')) {
+    							continue;
+    						}
+      					// pos code ends here
+      ]]></add>
+    </operation>
+  </file>
+</modification>

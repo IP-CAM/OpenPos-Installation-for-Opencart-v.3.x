@@ -1,0 +1,199 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <!-- <a href="{{ add }}" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-primary"><i class="fa fa-plus"></i></a> -->
+        <button type="button" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-danger" onclick="confirm('{{ text_confirm }}') ? $('#form-request-list').submit() : false;"><i class="fa fa-ban"></i></button>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if success %}
+    <div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_list }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ cancel }}" method="post" enctype="multipart/form-data" id="form-request-list">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <td style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></td>
+                  <td class="text-center">{% if sort == 'request_id' %}
+                    <a href="{{ sort_request_id }}" class="{{ order|lower }}">{{ column_request_id }}</a>
+                    {% else %}
+                    <a href="{{ sort_request_id }}">{{ column_request_id }}</a>
+                    {% endif %}</td>
+                  <td class="text-left">{% if sort == 'name' %}
+                    <a href="{{ sort_name }}" class="{{ order|lower }}">{{ column_uname }}</a>
+                    {% else %}
+                    <a href="{{ sort_name }}">{{ column_uname }}</a>
+                    {% endif %}</td>
+                  <td class="text-left">{% if sort == 'date_added' %}
+                    <a href="{{ sort_date_added }}" class="{{ order|lower }}">{{ column_date_added }}</a>
+                    {% else %}
+                    <a href="{{ sort_date_added }}">{{ column_date_added }}</a>
+                    {% endif %}</td>
+                  <td class="text-left" style="width: 350px;">{{ column_comment }}</td>
+                  <td class="text-center">{% if sort == 'status' %}
+                    <a href="{{ sort_status }}" class="{{ order|lower }}">{{ column_status }}</a>
+                    {% else %}
+                    <a href="{{ sort_status }}">{{ column_status }}</a>
+                    {% endif %}</td>
+                  <td class="text-right">{{ column_action }}</td>
+                </tr>
+              </thead>
+              <tbody>
+                {% if supply_requests %}
+                {% for supply_request in supply_requests %}
+                <tr>
+                  <td class="text-center">
+                    {% if not supply_request.status %}
+                    {% if supply_request.request_id in selected %}
+                    <input type="checkbox" name="selected[]" value="{{ supply_request.request_id }}" checked="checked" />
+                    {% else %}
+                    <input type="checkbox" name="selected[]" value="{{ supply_request.request_id }}" />
+                    {% endif %}
+                    {% endif %}
+                  </td>
+                  <td class="text-center">{{ supply_request.request_id }}</td>
+                  <td class="text-left">{{ supply_request.name }}</td>
+                  <td class="text-left">{{ supply_request.date_added }}</td>
+                  <td class="text-left">{{ supply_request.comment }}</td>
+                  <td class="text-center">{{ supply_request.status_text }}</td>
+                  <td class="text-right">
+                    <button class="btn btn-info show-request" data-toggle="tooltip" title="{{ button_view }}" type="button" request-id="{{ supply_request.request_id }}"><i class="fa fa-eye"></i></button>
+                    {% if not supply_request.cancel %}
+                    {% if supply_request.status %}
+                    <button class="btn btn-success" data-toggle="tooltip" title="{{ button_status }}" type="button" disabled><i class="fa fa-thumbs-up"></i></button>
+                    {% else %}
+                    <a href="{{ supply_request.update }}" class="btn btn-success" data-toggle="tooltip" title="{{ button_status }}"><i class="fa fa-thumbs-up"></i></a>
+                    {% endif %}
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                  <td class="text-center" colspan="7">{{ text_no_results }}</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </form>
+        <div class="row">
+          <div class="col-sm-6 text-left">{{ pagination }}</div>
+          <div class="col-sm-6 text-right">{{ results }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="viewRequest" class="modal fade" role="dialog" tabindex="-1">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Supply Request</h4>
+      </div>
+      <div class="modal-body" style="padding-bottom: 45px;">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <td>Supplier</td>
+                <td>Product</td>
+                <td>Quantity</td>
+                <td class="text-center">Comment</td>
+                <td>Status</td>
+                <!-- <td>Action</td> -->
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{{ button_close }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+<button class="hide" id="showModal" data-toggle="modal" data-target="#viewRequest"></button>
+<script type="text/javascript">
+  $('body').on('click', '.show-request', function () {
+    var request_id = $(this).attr('request-id');
+    $.ajax({
+      url: 'index.php?route=wkpos/supply_request/view&request_id=' + request_id + '&user_token={{ user_token }}',
+      dataType: 'json',
+      beforeSend: function () {
+        $('#showModal').trigger('click');
+        $('#viewRequest tbody').html('<tr class="text-center"><td colspan="5"><i class="fa fa-spinner fa-spin"></i></td></tr>');
+      },
+      success: function (json) {
+        if (json['supply_info']) {
+          var requests = json['supply_info'];
+          var html = '';
+          for (var i = 0; i < Object.keys(requests).length; i++) {
+            html += '<tr>';
+            html += '  <td>' + requests[i]['supplier'] + '</td>';
+            html += '  <td>' + requests[i]['name'] + '</td>';
+            html += '  <td>' + requests[i]['quantity'] + '</td>';
+            if (requests[i]['comment'] == '') {
+              html += '  <td class="text-center">';
+              html += '-';
+            } else {
+              html += '  <td>';
+              html += requests[i]['comment'];
+            }
+            html += '  </td>';
+            html += '  <td>';
+            if (requests[i]['status'] == '0') {
+              html += '{{ text_unfulfilled }}';
+              // html += '  </td>';
+              // html += '  <td>';
+              // html += '    <button type="button" class="btn btn-success" onclick="confirm(\'Are you sure?\')? requestInfo() : false;"><i class="fa fa-thumbs-up"></i></button>';
+            } else {
+              html += '{{ text_fulfilled }}';
+              // html += '  </td>';
+              // html += '  <td>';
+              // html += '    <button type="button" class="btn btn-success" disabled><i class="fa fa-thumbs-up"></i></button>';
+            }
+            html += '  </td>';
+            html += '</tr>';
+          }
+        } else {
+          html += '<tr class="text-center"><td colspan="5">It seems to have some error while requesting</td></tr>';
+        }
+        $('#viewRequest tbody').html(html);
+      },
+      error: function () {
+        $('.in').trigger('click');
+      }
+    })
+  });
+
+  // function requestInfo() {
+  //   console.log('here')
+  // }
+</script>
+{{ footer }}
